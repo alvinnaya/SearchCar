@@ -1,5 +1,16 @@
 <script setup lang="ts">
 import SearchButton from './SearchButton.vue';
+import { ref } from 'vue'
+
+
+const text = ref('')
+
+function onInput(e) {
+  // a v-on handler receives the native DOM event
+  // as the argument.
+  text.value = e.target.value
+  console.log(text.value)
+}
 
 </script>
 
@@ -10,7 +21,8 @@ import SearchButton from './SearchButton.vue';
           <img class=" h-[80%] m-auto" src="../assets/search.svg">
         </div>
   
-        <input type="text" placeholder="Masukkan sesuatu... " class="p-2 text-xl outline-none w-full bg-secondary">
+        <input :value="text" @input="onInput"
+         type="text" placeholder="Masukkan sesuatu... " class="p-2 text-xl outline-none w-full bg-secondary">
 
         <!-- this is image logo -->
         <div class="w-[2.2rem] h-[2.2rem] flex justify-center items-center cursor-pointer bg-secondary border border-orange mx-2 rounded-md shrink-0">
