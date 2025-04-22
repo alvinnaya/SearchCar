@@ -1,30 +1,20 @@
 <script setup lang="ts">
 import SearchButton from './SearchButton.vue';
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 
 const isThrottling = ref(false);
 const data = ref<any[]>([]);
 const page = ref<number>(2);
+const url = ref<string>("https://api.pexels.com/v1/curated?")
 const isGetData = ref<boolean>(false)
-
+const props = defineProps(['searchQuery','data']);
+const emit = defineEmits(['getInitialData','getNewData']);
 
 const getMoreData = async ()=>{
     isGetData.value =await true;
     console.log("start mount :",data.value.length)
-  const url = `https://api.pexels.com/v1/curated?page=${page.value}&per_page=40`;
-  const res = (await fetch(url,{
-    method: 'GET',
-    headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'qxYH91LEBqg5W1UWZ48ONgFu7AHXwEBCaWBMaT8kwdQ8b9tqtKL671Bz' // Misalnya token untuk otentikasi
-          }
-  }))
-
-
-const newdata = await res.json()
-data.value = data.value.concat(newdata.photos)
-
-    
+    emit('getNewData', page.value)
+  
 page.value = await page.value + 1;
 isGetData.value = await false;
 
@@ -67,23 +57,8 @@ onMounted(async() => {
   
   console.log("start mount")
   isGetData.value = true;
-  const url = "https://api.pexels.com/v1/curated?page=0&per_page=40";
-  const res = (await fetch(url,{
-    method: 'GET',
-    headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'qxYH91LEBqg5W1UWZ48ONgFu7AHXwEBCaWBMaT8kwdQ8b9tqtKL671Bz' // Misalnya token untuk otentikasi
-          }
-  }))
-
-
-const newdata = await res.json()
-isGetData.value = false;
-
-data.value = data.value.concat(newdata.photos)
-
-  
-  console.log("get data : ", newdata.photos.length)
+  emit('getNewData', 0)
+  isGetData.value = false;
 
 
   window.addEventListener('scroll', scrollTimeout);
@@ -93,11 +68,13 @@ data.value = data.value.concat(newdata.photos)
 
 })
 
+
+
 </script>
 
 <template>
     <div class=" w-full p-2 m-auto ">
-
+      <h1 class="text-3xl text-center font-semibold">{{ searchQuery }}</h1>
         <div :style="`grid-template-rows: repeat(${data.values.length}, minmax(0, 1fr));`"
         :class=" `grid col-span-1 bg-secondary gap-2  items-center
         lg:grid-cols-5 md:grid-cols-4 sm:grid-cols-3 grid-cols-2`">
@@ -106,31 +83,11 @@ data.value = data.value.concat(newdata.photos)
               
                
                
-                <img v-for="(item, index) in data" :key="item.id" :src="item.src.medium"
+                <img v-for="(item, index) in props.data" :key="item.payload.id" :src="`http://127.0.0.1:5000/get-image/${item.payload.id}.jpg`"
                 :class="`w-full col-span-1 bg-no-repeat my-2  m-2 rounded-lg row-start-auto
                 `">
-               
-     
-                
-     
-               
-            
-          
-               
-
-          
-
-               
-             
-                
-              
-               
-  
-               
-                
-              
-              
-
+    
+ 
         </div>
 
     </div>
